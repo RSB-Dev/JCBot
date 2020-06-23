@@ -242,7 +242,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                     }
                 }
                 Condition.sleep(smallSleep());
-                if (furnaceReachable == true && ctx.movement.distance(furnaceTile) < 3 && ctx.players.local().animation() != 899) {
+                if (furnaceReachable == true && ctx.movement.distance(furnaceTile) < 10 && ctx.players.local().animation() != 899) {
                     Condition.sleep(smallSleep());
                     if (ctx.players.local().animation() != 899 && ctx.inventory.select().id(itemId).count() > 0) {
                         ctx.objects.select().name("Furnace").poll().click("Smelt");
