@@ -8,6 +8,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 @Script.Manifest(name="JewelryCrafting", description="Jewel Crafting", properties="client=4; author=MattyIce; topic=999;")
 
@@ -133,7 +137,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
             Condition.sleep(smallSleep());
             ctx.bank.open();
             Condition.sleep(smallSleep());
-            if ((int) (Math.random() * 15 + 1) == 10) {
+            if ((int) (Math.random() * 20 + 1) == 10) {
                 AntiBanSleep();
             }
         }
@@ -257,6 +261,12 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         double endTime = System.currentTimeMillis();
         double totalTime = (endTime - startTime)/1000;
         double totalTimeHours = totalTime/60/60;
+        long time = (long)((endTime-startTime)/1000);
+        String format = String.format("%%0%dd", 2);
+        String seconds = String.format(format, time % 60);
+        String minutes = String.format(format, (time % 3600) / 60);
+        String hours = String.format(format, time / 3600);
+        String elapsedTime =  hours + ":" + minutes + ":" + seconds;
         double craftingRateDouble = craftingGained/totalTimeHours;
         int craftingRate = (int)craftingRateDouble;
         int productPerHour = (int)(productHour/totalTimeHours);
@@ -271,7 +281,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         graphics.drawRect(0, 0, 175, 125);
         graphics.drawString("JCBot v0.5", 7, 20);
         graphics.setFont(new Font("Roboto", Font.BOLD, 12));
-        graphics.drawString("Runtime: "+totalTime+"s", 7, 45);
+        graphics.drawString("Runtime: "+elapsedTime, 7, 45);
         graphics.drawString("Crafting xp gained: "+craftingGained,7,70);
         graphics.drawString("Crafting xp/hr: "+craftingRate,7,95);
         graphics.drawString("Product/hr: "+productPerHour,7,120);
