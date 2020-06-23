@@ -180,13 +180,16 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                         System.exit(0);
                     }
                 }
+                if(ctx.inventory.select().id(itemId).count() != 0 || ctx.inventory.select().id(gemId).count() != 0 && gemId != -1){
+                    ctx.bank.deposit(itemId, Bank.Amount.ALL);
+                    ctx.bank.deposit(gemId, Bank.Amount.ALL);
+                }
                 if(withdrawA == true) {
                     ctx.bank.withdrawAmount(itemId, Bank.Amount.ALL);
                     productHour = productHour+27;
                 }
                 else {
                     ctx.bank.withdrawAmount(itemId, 13);
-                    Condition.sleep(smallSleep());
                     ctx.bank.withdrawAmount(gemId,13);
                     productHour = productHour+13;
                 }
@@ -195,7 +198,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
             }
 
             //Check if Gold Bars are Done Smelting
-            if (ctx.inventory.select().id(itemId).count() == 0 && ctx.inventory.select().name(productMaterial+" "+productType).count() > 0 || ctx.inventory.select().id(gemId).count() == 0 && gemId != -1) {
+            if (ctx.inventory.select().id(itemId).count() == 0 && mouldStatus == true || ctx.inventory.select().id(gemId).count() == 0 && gemId != -1) {
                 //Inventory contains no bars, but contains rings -- need to deposit
                 System.out.println("Done Smelting -- Banking");
                 GetBank();
@@ -204,13 +207,16 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                 }
                 ctx.bank.deposit(productMaterial+" "+productType, Bank.Amount.ALL);
                 Condition.sleep(smallSleep());
+                if(ctx.inventory.select().id(itemId).count() != 0 || ctx.inventory.select().id(gemId).count() != 0 && gemId != -1){
+                    ctx.bank.deposit(itemId, Bank.Amount.ALL);
+                    ctx.bank.deposit(gemId, Bank.Amount.ALL);
+                }
                 if(withdrawA == true) {
                     ctx.bank.withdrawAmount(itemId, Bank.Amount.ALL);
                     productHour = productHour+27;
                 }
                 else {
                     ctx.bank.withdrawAmount(itemId, 13);
-                    Condition.sleep(smallSleep());
                     ctx.bank.withdrawAmount(gemId,13);
                     productHour = productHour+13;
                 }
