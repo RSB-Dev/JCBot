@@ -8,19 +8,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 
-@Script.Manifest(name="JewelleryCrafting", description="Jewell Crafting", properties="client=4; author=MattyIce; topic=999;")
-
+@Script.Manifest(name="JewelryCrafting", description="Jewel Crafting", properties="client=4; author=MattyIce; topic=999;")
 
 public class JCBot extends PollingScript<ClientContext> implements PaintListener{
 
     int itemId = 2357;
-    int productId = 1635;
+    int gemId = -1;
+    String productMaterial = "Gold";
+    String productType = "ring";
     int xpPerProduct = 15;
     int mouldId = 1592;
     int component1 = 446;
     int component2 = 7;
+    int componentDynamic = 0;
+    boolean withdrawA = true;
     boolean START = false;
     Tile furnaceTile = new Tile (3275,3186,0);
     Tile doorTile = new Tile (3280,3185,0);
@@ -38,7 +40,8 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                 "Necklace"
         };
         String CChoices2[]={
-                "Gold"
+                "Gold",
+                "Sapphire"
         };
 
         JComboBox C = new JComboBox(CChoices);
@@ -59,15 +62,19 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
             setVisible(true);
         }
 
+        //GUI Event Listener
         public void actionPerformed(ActionEvent e) {
-            System.out.println(C.getSelectedIndex());
-            if(C.getSelectedIndex() == 1){productId = 1673; xpPerProduct = 30; mouldId = 1595; component1 = 446; component2 = 34;}
-            if(C.getSelectedIndex() == 2){productId = 1654; xpPerProduct = 20; mouldId = 1597; component1 = 446; component2 = 21;}
+            if(C2.getSelectedIndex() == 1){productMaterial = "Sapphire"; gemId=1607; componentDynamic=1; withdrawA = false;}
+
+            if(C.getSelectedIndex() == 1){productType = "amulet (u)"; xpPerProduct = 30; mouldId = 1595; component1 = 446; component2 = 34;}
+            if(C.getSelectedIndex() == 2){productType = "necklace"; xpPerProduct = 20; mouldId = 1597; component1 = 446; component2 = 21;}
             START = true;
+            System.out.println("Material:"+productMaterial+", Product Type:"+productType+", GemId:"+gemId);
             dispose();
         }
     }
 
+    //Dynamic Sleeps
     public int smallSleep() {
         return (int) (Math.random() * 1250 + 650);
     }
@@ -82,21 +89,20 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
 
     //Anti Ban Sleep
     public void AntiBanSleep() {
-        System.out.println("Anti Ban Sleeping");
+        System.out.println("Anti Ban -- Sleeping");
         Condition.sleep((int) (Math.random() * 39087 + 12350));
     }
 
     //Check Bank Supply Status
-    public void SupplyCheck(int id) {
-        if (ctx.bank.id(id).count() == 0) {
+    public void SupplyCheck(int id, int id2) {
+        Condition.sleep(200);
+        if (ctx.bank.select().id(id).count() == 0 || ctx.bank.select().id(id2).count() == 0 && id2 != -1) {
             //If bank does not contain supplies -- Stop Script
             Condition.sleep(200);
-            System.out.println("Out of Gold Bars -- Stopping Script");
+            System.out.println("Out of Supplies -- Stopping Script");
             System.exit(0);
         }
-        else {
-            System.out.println("Supply check -- OK");
-        }
+        else {System.out.println("Supply check -- OK");}
     }
 
     //Move to Nearest Bank -- Open Bank
@@ -116,7 +122,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         }
 
         if (ctx.bank.inViewport() == true && ctx.bank.opened() == false){
-            System.out.println("opening Bank");
+            System.out.println("Opening Bank");
             Condition.sleep(smallSleep());
             ctx.bank.open();
             Condition.sleep(smallSleep());
@@ -146,13 +152,13 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                 mouldStatus = true;
             }
 
-            //Check Inventory Gold Bar Status
-            if (ctx.inventory.select().id(itemId).count() == 0 && ctx.inventory.select().id(productId).count() == 0) {
+            //Check Inventory Supply Status
+            if (ctx.inventory.select().id(itemId).count() == 0 && ctx.inventory.select().name(productMaterial+" "+productType).count() == 0 && ctx.inventory.select().id(gemId).count() == 0) {
                 //No gold bars and no gold rings in inventory -- need to withdraw bars
-                System.out.println("No golds bars or jewelry in inventory -- Banking");
+                System.out.println("No supplies or jewelry in inventory -- Banking");
                 GetBank();
                 if (ctx.bank.opened() == true) {
-                    SupplyCheck(itemId);
+                    SupplyCheck(itemId, gemId);
                 }
                 if (mouldStatus == false) {
                     if (ctx.bank.select().id(mouldId).count() > 0) {
@@ -163,22 +169,36 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                         System.exit(0);
                     }
                 }
-                ctx.bank.withdrawAmount(itemId, Bank.Amount.ALL);
+                if(withdrawA == true) {
+                    ctx.bank.withdrawAmount(itemId, Bank.Amount.ALL);
+                }
+                else {
+                    ctx.bank.withdrawAmount(itemId, 13);
+                    Condition.sleep(smallSleep());
+                    ctx.bank.withdrawAmount(gemId,13);
+                }
                 Condition.sleep(smallSleep());
                 ctx.bank.close();
             }
 
             //Check if Gold Bars are Done Smelting
-            if (ctx.inventory.select().id(itemId).count() == 0 && ctx.inventory.select().id(productId).count() > 0) {
+            if (ctx.inventory.select().id(itemId).count() == 0 && ctx.inventory.select().name(productMaterial+" "+productType).count() > 0) {
                 //Inventory contains no bars, but contains rings -- need to deposit
                 System.out.println("Done Smelting -- Banking");
                 GetBank();
                 if (ctx.bank.opened() == true) {
-                    SupplyCheck(itemId);
+                    SupplyCheck(itemId, gemId);
                 }
-                ctx.bank.deposit(productId, Bank.Amount.ALL);
+                ctx.bank.deposit(productMaterial+" "+productType, Bank.Amount.ALL);
                 Condition.sleep(smallSleep());
-                ctx.bank.withdrawAmount(itemId, Bank.Amount.ALL);
+                if(withdrawA == true) {
+                    ctx.bank.withdrawAmount(itemId, Bank.Amount.ALL);
+                }
+                else {
+                    ctx.bank.withdrawAmount(itemId, 13);
+                    Condition.sleep(smallSleep());
+                    ctx.bank.withdrawAmount(gemId,13);
+                }
                 Condition.sleep(smallSleep());
                 ctx.bank.close();
             }
@@ -207,7 +227,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                         ctx.objects.select().name("Furnace").poll().click("Smelt");
                         System.out.println("Smelting");
                         Condition.sleep(mediumSleep());
-                        ctx.widgets.component(component1,component2).click();
+                        ctx.widgets.component(component1,component2+componentDynamic).click();
                         Condition.sleep(longSleep());
                     }
                 }
@@ -215,11 +235,15 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         }
     }
 
+    //Graphical Overlay
     int initialCrafting = ctx.skills.experience(Constants.SKILLS_CRAFTING);
     double startTime = System.currentTimeMillis();
 
     @Override
     public void repaint(Graphics graphics) {
+        if(productMaterial+" "+productType == "Sapphire ring"){ xpPerProduct = 40;}
+        if(productMaterial+" "+productType == "Sapphire necklace"){ xpPerProduct = 55;}
+        if(productMaterial+" "+productType == "Sapphire amulet (u)"){ xpPerProduct = 65;}
         int currentCrafting = ctx.skills.experience(Constants.SKILLS_CRAFTING);
         int craftingGained = currentCrafting - initialCrafting;
         double endTime = System.currentTimeMillis();
@@ -230,7 +254,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         craftingGained = Math.round(craftingGained);
         craftingRate = Math.round(craftingRate);
 
-        //Crafting xp gained, xp/hr, items/hr
+        //Crafting xp gained, xp/hr, items/hr, runtime
         graphics.setColor(new Color(255, 184, 0, 228));
         graphics.fillRect(0, 0, 175, 125);
         graphics.setColor(new Color(0, 97, 255));
