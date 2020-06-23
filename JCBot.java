@@ -228,7 +228,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
             if (ctx.inventory.select().id(itemId).count() > 0 && mouldStatus == true) {
                 //Gold Bars and Mould in Inventory -- Get Furnace and Smelt
                 boolean furnaceReachable = ctx.movement.reachable(doorTile, furnaceTile);
-                if (furnaceReachable == true && ctx.movement.distance(furnaceTile) > 3) {
+                if (furnaceReachable == true && ctx.movement.distance(furnaceTile) > 9) {
                     ctx.movement.step(furnaceTile);
                     System.out.println("Moving to furnace");
                     Condition.sleep(mediumSleep());
