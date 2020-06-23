@@ -195,7 +195,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
             }
 
             //Check if Gold Bars are Done Smelting
-            if (ctx.inventory.select().id(itemId).count() == 0 && ctx.inventory.select().name(productMaterial+" "+productType).count() > 0) {
+            if (ctx.inventory.select().id(itemId).count() == 0 && ctx.inventory.select().name(productMaterial+" "+productType).count() > 0 || ctx.inventory.select().id(gemId).count() == 0 && ctx.inventory.select().name(productMaterial+" "+productType).count() > 0) {
                 //Inventory contains no bars, but contains rings -- need to deposit
                 System.out.println("Done Smelting -- Banking");
                 GetBank();
