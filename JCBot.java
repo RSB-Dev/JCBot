@@ -17,13 +17,14 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
     int gemId = -1;
     String productMaterial = "Gold";
     String productType = "ring";
-    int xpPerProduct = 15;
+    int productHour = 0;
     int mouldId = 1592;
     int component1 = 446;
     int component2 = 7;
     int componentDynamic = 0;
     boolean withdrawA = true;
     boolean START = false;
+
     Tile furnaceTile = new Tile (3275,3186,0);
     Tile doorTile = new Tile (3280,3185,0);
 
@@ -41,7 +42,10 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         };
         String CChoices2[]={
                 "Gold",
-                "Sapphire"
+                "Sapphire",
+                "Emerald",
+                "Ruby",
+                "Diamond"
         };
 
         JComboBox C = new JComboBox(CChoices);
@@ -65,9 +69,12 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         //GUI Event Listener
         public void actionPerformed(ActionEvent e) {
             if(C2.getSelectedIndex() == 1){productMaterial = "Sapphire"; gemId=1607; componentDynamic=1; withdrawA = false;}
+            if(C2.getSelectedIndex() == 2){productMaterial = "Emerald"; gemId=1605; componentDynamic=2; withdrawA = false;}
+            if(C2.getSelectedIndex() == 3){productMaterial = "Ruby"; gemId=1603; componentDynamic=3; withdrawA = false;}
+            if(C2.getSelectedIndex() == 4){productMaterial = "Diamond"; gemId=1601; componentDynamic=4; withdrawA = false;}
 
-            if(C.getSelectedIndex() == 1){productType = "amulet (u)"; xpPerProduct = 30; mouldId = 1595; component1 = 446; component2 = 34;}
-            if(C.getSelectedIndex() == 2){productType = "necklace"; xpPerProduct = 20; mouldId = 1597; component1 = 446; component2 = 21;}
+            if(C.getSelectedIndex() == 1){productType = "amulet (u)"; mouldId = 1595; component1 = 446; component2 = 34;}
+            if(C.getSelectedIndex() == 2){productType = "necklace"; mouldId = 1597; component1 = 446; component2 = 21;}
             START = true;
             System.out.println("Material:"+productMaterial+", Product Type:"+productType+", GemId:"+gemId);
             dispose();
@@ -171,11 +178,13 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                 }
                 if(withdrawA == true) {
                     ctx.bank.withdrawAmount(itemId, Bank.Amount.ALL);
+                    productHour = productHour+27;
                 }
                 else {
                     ctx.bank.withdrawAmount(itemId, 13);
                     Condition.sleep(smallSleep());
                     ctx.bank.withdrawAmount(gemId,13);
+                    productHour = productHour+13;
                 }
                 Condition.sleep(smallSleep());
                 ctx.bank.close();
@@ -193,11 +202,13 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
                 Condition.sleep(smallSleep());
                 if(withdrawA == true) {
                     ctx.bank.withdrawAmount(itemId, Bank.Amount.ALL);
+                    productHour = productHour+27;
                 }
                 else {
                     ctx.bank.withdrawAmount(itemId, 13);
                     Condition.sleep(smallSleep());
                     ctx.bank.withdrawAmount(gemId,13);
+                    productHour = productHour+13;
                 }
                 Condition.sleep(smallSleep());
                 ctx.bank.close();
@@ -241,9 +252,6 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
 
     @Override
     public void repaint(Graphics graphics) {
-        if(productMaterial+" "+productType == "Sapphire ring"){ xpPerProduct = 40;}
-        if(productMaterial+" "+productType == "Sapphire necklace"){ xpPerProduct = 55;}
-        if(productMaterial+" "+productType == "Sapphire amulet (u)"){ xpPerProduct = 65;}
         int currentCrafting = ctx.skills.experience(Constants.SKILLS_CRAFTING);
         int craftingGained = currentCrafting - initialCrafting;
         double endTime = System.currentTimeMillis();
@@ -265,6 +273,6 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         graphics.drawString("Runtime: "+totalTime+"s", 7, 45);
         graphics.drawString("Crafting xp gained: "+craftingGained,7,70);
         graphics.drawString("Crafting xp/hr: "+craftingRate,7,95);
-        graphics.drawString("Product/hr: "+(craftingRate/xpPerProduct),7,120);
+        graphics.drawString("Product/hr: "+productHour/totalTimeHours,7,120);
     }
 }
