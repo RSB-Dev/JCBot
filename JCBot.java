@@ -259,6 +259,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         double totalTimeHours = totalTime/60/60;
         double craftingRateDouble = craftingGained/totalTimeHours;
         int craftingRate = (int)craftingRateDouble;
+        int productPerHour = (int)(productHour/totalTimeHours);
         craftingGained = Math.round(craftingGained);
         craftingRate = Math.round(craftingRate);
 
@@ -273,6 +274,6 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         graphics.drawString("Runtime: "+totalTime+"s", 7, 45);
         graphics.drawString("Crafting xp gained: "+craftingGained,7,70);
         graphics.drawString("Crafting xp/hr: "+craftingRate,7,95);
-        graphics.drawString("Product/hr: "+productHour/totalTimeHours,7,120);
+        graphics.drawString("Product/hr: "+productPerHour,7,120);
     }
 }
