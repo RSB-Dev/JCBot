@@ -147,6 +147,13 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
             //move to nearestBank tile
             System.out.println("Moving to Nearest Bank");
             Condition.sleep(mediumSleep());
+            if ((int) (Math.random() * 3 + 1) == 2) {
+                nearestBank = nearestBank.derive(1,1);
+                if ((int) (Math.random() * 2 + 1) == 2){
+                    nearestBank = nearestBank.derive(-2,-2);
+                }
+            }
+
             ctx.movement.step(nearestBank);
         }
 
@@ -246,10 +253,17 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
             if (ctx.inventory.select().id(itemId).count() > 0 && mouldStatus == true) {
                 //Gold Bars and Mould in Inventory -- Get Furnace and Smelt
                 boolean furnaceReachable = ctx.movement.reachable(doorTile, furnaceTile);
-                if (furnaceReachable == true && ctx.movement.distance(furnaceTile) > 9) {
-                    ctx.movement.step(furnaceTile);
+                if (furnaceReachable == true && ctx.movement.distance(furnaceTile) > 10) {
+                    Tile furnaceTile2 = furnaceTile;
+                    if ((int) (Math.random() * 3 + 1) == 2) {
+                        furnaceTile2 = furnaceTile2.derive(1,1);
+                        if ((int) (Math.random() * 2 + 1) == 2) {
+                            furnaceTile2 = furnaceTile2.derive(-2,-2);
+                        }
+                    }
+                    ctx.movement.step(furnaceTile2);
                     System.out.println("Moving to furnace");
-                    Condition.sleep(mediumSleep());
+                    Condition.sleep(smallSleep());
                 }
                 if (furnaceReachable == false) {
                     Condition.sleep(mediumSleep());
@@ -303,7 +317,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         graphics.setColor(new Color(0, 97, 255));
         graphics.setFont(new Font("Roboto", Font.BOLD, 15));
         graphics.drawRect(0, 0, 175, 125);
-        graphics.drawString("JCBot v1.0", 7, 20);
+        graphics.drawString("JCBot v1.0.1", 7, 20);
         graphics.setFont(new Font("Roboto", Font.BOLD, 12));
         graphics.drawString("Runtime: "+elapsedTime, 7, 45);
         graphics.drawString("Crafting xp gained: "+craftingGained,7,70);
