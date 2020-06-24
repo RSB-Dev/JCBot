@@ -8,10 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 
 @Script.Manifest(name="JewelryCrafting", description="Jewel Crafting", properties="client=4; author=MattyIce; topic=999;")
 
@@ -39,32 +35,49 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         JButton b = new JButton("Start");
         JLabel L = new JLabel("Material: ");
         JLabel L2 = new JLabel("Type: ");
+        JLabel L3 = new JLabel("Location: ");
+        JLabel L4 = new JLabel(" ");
         String CChoices[]={
                 "Ring",
                 "Amulet",
-                "Necklace"
+                "Necklace",
+                "Bracelet(M)"
         };
         String CChoices2[]={
                 "Gold",
                 "Sapphire",
                 "Emerald",
                 "Ruby",
-                "Diamond"
+                "Diamond",
+                "Dragonstone(M)"
+        };
+        String CChoices3[]={
+                "Al-Kharid",
+                "Edgeville(M)"
         };
 
         JComboBox C = new JComboBox(CChoices);
         JComboBox C2 = new JComboBox(CChoices2);
+        JComboBox C3 = new JComboBox(CChoices3);
 
         public H(){
             super("JCBot");
-            setSize(400,200);
+            setSize(400,400);
             setResizable(true);
             setLocation(350,250);
+            GridLayout layout = new GridLayout(0,1);
+            p.setLayout(layout);
+            Font font = new Font("Roboto", Font.BOLD, 16);
+            p.setFont(font);
+            p.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+            p.add(L3);
+            p.add(C3);
             p.add(L);
             p.add(C2);
             p.add(L2);
             p.add(C);
             b.addActionListener(this);
+            p.add(L4);
             p.add(b);
             add(p);
             setVisible(true);
@@ -72,13 +85,18 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
 
         //GUI Event Listener
         public void actionPerformed(ActionEvent e) {
+            if(C3.getSelectedIndex() == 1){furnaceTile = new Tile(3108,3499,0); doorTile = furnaceTile;}
+
             if(C2.getSelectedIndex() == 1){productMaterial = "Sapphire"; gemId=1607; componentDynamic=1; withdrawA = false;}
             if(C2.getSelectedIndex() == 2){productMaterial = "Emerald"; gemId=1605; componentDynamic=2; withdrawA = false;}
             if(C2.getSelectedIndex() == 3){productMaterial = "Ruby"; gemId=1603; componentDynamic=3; withdrawA = false;}
             if(C2.getSelectedIndex() == 4){productMaterial = "Diamond"; gemId=1601; componentDynamic=4; withdrawA = false;}
+            if(C2.getSelectedIndex() == 5){productMaterial = "Dragonstone"; gemId=1615; componentDynamic=4; withdrawA = false;}
 
             if(C.getSelectedIndex() == 1){productType = "amulet (u)"; mouldId = 1595; component1 = 446; component2 = 34;}
             if(C.getSelectedIndex() == 2){productType = "necklace"; mouldId = 1597; component1 = 446; component2 = 21;}
+            if(C.getSelectedIndex() == 3){productType = "bracelet"; mouldId = 11065; component1 = 446; component2 = 47;}
+
             START = true;
             System.out.println("Material:"+productMaterial+", Product Type:"+productType+", GemId:"+gemId);
             dispose();
