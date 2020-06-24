@@ -303,7 +303,7 @@ public class JCBot extends PollingScript<ClientContext> implements PaintListener
         graphics.setColor(new Color(0, 97, 255));
         graphics.setFont(new Font("Roboto", Font.BOLD, 15));
         graphics.drawRect(0, 0, 175, 125);
-        graphics.drawString("JCBot v0.5", 7, 20);
+        graphics.drawString("JCBot v1.0", 7, 20);
         graphics.setFont(new Font("Roboto", Font.BOLD, 12));
         graphics.drawString("Runtime: "+elapsedTime, 7, 45);
         graphics.drawString("Crafting xp gained: "+craftingGained,7,70);
